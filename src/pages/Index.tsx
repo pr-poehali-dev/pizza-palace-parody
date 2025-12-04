@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import Icon from '@/components/ui/icon';
+import GameMenu from '@/components/game/GameMenu';
+import GameOffice from '@/components/game/GameOffice';
+import CameraSystem from '@/components/game/CameraSystem';
+import JumpscareScreen from '@/components/game/JumpscareScreen';
 
 type GameState = 'menu' | 'playing' | 'gameover' | 'win';
 type Animatronic = 'freddy' | 'bonnie' | 'chica';
@@ -191,145 +192,22 @@ export default function Index() {
   const timeDisplay = `${currentHour}:00 AM`;
 
   if (jumpscareActive) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center crt-effect overflow-hidden">
-        <div className="animate-shake">
-          <div className="text-9xl animate-pulse">
-            {jumpscareActive === 'freddy' && '🐻'}
-            {jumpscareActive === 'bonnie' && '🐰'}
-            {jumpscareActive === 'chica' && '🐔'}
-          </div>
-          <p className="text-6xl text-red-600 pixel-text mt-4 text-center glitch">
-            {jumpscareActive === 'freddy' && 'ФРЕДДИ!'}
-            {jumpscareActive === 'bonnie' && 'БОННИ!'}
-            {jumpscareActive === 'chica' && 'ЧИКА!'}
-          </p>
-        </div>
-        <div className="absolute inset-0 bg-red-600 opacity-30 animate-pulse"></div>
-      </div>
-    );
+    return <JumpscareScreen animatronic={jumpscareActive} />;
   }
 
-  if (gameState === 'menu') {
+  if (gameState === 'menu' || gameState === 'win' || gameState === 'gameover') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center crt-effect p-4">
-        <Card className="p-12 bg-gray-800/90 border-red-600 border-4 max-w-2xl w-full">
-          <div className="text-center space-y-8">
-            <h1 className="text-7xl font-bold text-red-600 pixel-text animate-flicker mb-4">
-              🍕 FIVE NIGHTS AT
-            </h1>
-            <h2 className="text-6xl font-bold text-purple-400 pixel-text animate-pulse-slow">
-              PIZZA PALACE
-            </h2>
-            
-            <div className="h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent my-8"></div>
-            
-            <div className="space-y-4">
-              <Button
-                onClick={startGame}
-                className="w-full text-3xl py-8 bg-red-600 hover:bg-red-700 border-4 border-red-800 pixel-text transition-all hover:scale-105"
-              >
-                НОВАЯ ИГРА
-              </Button>
-              
-              <Button
-                onClick={() => {}}
-                disabled
-                className="w-full text-3xl py-8 bg-gray-700 border-4 border-gray-800 pixel-text opacity-50"
-              >
-                ПРОДОЛЖИТЬ
-              </Button>
-              
-              <Button
-                onClick={() => {}}
-                disabled
-                className="w-full text-3xl py-8 bg-purple-600 hover:bg-purple-700 border-4 border-purple-800 pixel-text opacity-50"
-              >
-                КАСТОМ НОЧЬ
-              </Button>
-              
-              <Button
-                onClick={() => {}}
-                disabled
-                className="w-full text-3xl py-8 bg-gray-700 border-4 border-gray-800 pixel-text opacity-50"
-              >
-                НАСТРОЙКИ
-              </Button>
-            </div>
-
-            <p className="text-xl text-gray-400 pixel-text mt-8">
-              НОЧЬ: {night} / 7
-            </p>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  if (gameState === 'win') {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-green-900 to-gray-900 flex items-center justify-center crt-effect p-4">
-        <Card className="p-12 bg-gray-800/90 border-green-600 border-4 max-w-2xl w-full text-center">
-          <h1 className="text-7xl font-bold text-green-400 pixel-text mb-8">
-            🎉 ВЫЖИЛ!
-          </h1>
-          <p className="text-4xl text-gray-300 pixel-text mb-8">
-            НОЧЬ {night} ПРОЙДЕНА
-          </p>
-          <p className="text-2xl text-gray-400 pixel-text mb-12">
-            6:00 AM - СМЕНА ОКОНЧЕНА
-          </p>
-          <div className="space-y-4">
-            <Button
-              onClick={() => {
-                setNight(prev => Math.min(7, prev + 1));
-                setGameState('menu');
-              }}
-              className="w-full text-3xl py-8 bg-green-600 hover:bg-green-700 border-4 border-green-800 pixel-text"
-            >
-              СЛЕДУЮЩАЯ НОЧЬ
-            </Button>
-            <Button
-              onClick={() => setGameState('menu')}
-              className="w-full text-3xl py-8 bg-gray-600 hover:bg-gray-700 border-4 border-gray-800 pixel-text"
-            >
-              В МЕНЮ
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  if (gameState === 'gameover') {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-red-900 to-gray-900 flex items-center justify-center crt-effect p-4">
-        <Card className="p-12 bg-gray-800/90 border-red-600 border-4 max-w-2xl w-full text-center">
-          <h1 className="text-7xl font-bold text-red-600 pixel-text mb-8 glitch">
-            💀 GAME OVER
-          </h1>
-          <p className="text-4xl text-gray-300 pixel-text mb-8">
-            НОЧЬ {night} ПРОВАЛЕНА
-          </p>
-          <p className="text-2xl text-gray-400 pixel-text mb-12">
-            {timeDisplay} - ВЫ НЕ ВЫЖИЛИ
-          </p>
-          <div className="space-y-4">
-            <Button
-              onClick={startGame}
-              className="w-full text-3xl py-8 bg-red-600 hover:bg-red-700 border-4 border-red-800 pixel-text"
-            >
-              ПОПРОБОВАТЬ СНОВА
-            </Button>
-            <Button
-              onClick={() => setGameState('menu')}
-              className="w-full text-3xl py-8 bg-gray-600 hover:bg-gray-700 border-4 border-gray-800 pixel-text"
-            >
-              В МЕНЮ
-            </Button>
-          </div>
-        </Card>
-      </div>
+      <GameMenu
+        gameState={gameState}
+        night={night}
+        timeDisplay={timeDisplay}
+        onStartGame={startGame}
+        onNextNight={() => {
+          setNight(prev => Math.min(7, prev + 1));
+          setGameState('menu');
+        }}
+        onBackToMenu={() => setGameState('menu')}
+      />
     );
   }
 
@@ -338,231 +216,26 @@ export default function Index() {
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwwLDAsMC4xKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-20"></div>
 
       {!cameraOpen ? (
-        <div className="relative h-screen flex flex-col">
-          <div className="flex-1 relative bg-gradient-to-b from-gray-800 to-gray-900 border-b-4 border-red-900">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-9xl opacity-20">🏢</div>
-            </div>
-            
-            {flashlightOn && energy > 0 && (
-              <div className="absolute inset-0 bg-gradient-radial from-yellow-300/30 via-transparent to-transparent"></div>
-            )}
-
-            <div className="absolute top-8 left-8 space-y-4">
-              <div className="bg-black/80 p-4 border-2 border-red-600">
-                <p className="text-3xl pixel-text text-red-400">НОЧЬ {night}</p>
-              </div>
-              <div className="bg-black/80 p-4 border-2 border-blue-600">
-                <p className="text-3xl pixel-text text-blue-400">{timeDisplay}</p>
-              </div>
-            </div>
-
-            <div className="absolute top-8 right-8">
-              <div className="bg-black/80 p-4 border-2 border-yellow-600">
-                <p className="text-3xl pixel-text text-yellow-400">
-                  ЭНЕРГИЯ: {Math.floor(energy)}%
-                </p>
-                <div className="w-48 h-4 bg-gray-700 mt-2 border-2 border-yellow-600">
-                  <div
-                    className={`h-full ${energy > 50 ? 'bg-green-500' : energy > 20 ? 'bg-yellow-500' : 'bg-red-500 animate-pulse'}`}
-                    style={{ width: `${energy}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="h-48 bg-gray-800 border-t-4 border-red-900 flex items-center justify-between px-8">
-            <div className="space-x-4">
-              <Button
-                onClick={() => energy > 0 && setLeftDoorClosed(!leftDoorClosed)}
-                disabled={energy <= 0}
-                className={`text-2xl py-6 px-8 pixel-text ${
-                  leftDoorClosed ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-                }`}
-              >
-                <Icon name={leftDoorClosed ? 'DoorClosed' : 'DoorOpen'} size={32} className="mr-2" />
-                ЛЕВАЯ ДВЕРЬ
-              </Button>
-              
-              <Button
-                onClick={() => energy > 0 && setFlashlightOn(!flashlightOn)}
-                disabled={energy <= 0}
-                className={`text-2xl py-6 px-8 pixel-text ${
-                  flashlightOn ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-600 hover:bg-gray-700'
-                }`}
-              >
-                <Icon name="Lightbulb" size={32} className="mr-2" />
-                ФОНАРИК
-              </Button>
-            </div>
-
-            <Button
-              onClick={() => energy > 0 && setCameraOpen(true)}
-              disabled={energy <= 0}
-              className="text-2xl py-6 px-8 bg-purple-600 hover:bg-purple-700 pixel-text"
-            >
-              <Icon name="Camera" size={32} className="mr-2" />
-              КАМЕРЫ
-            </Button>
-
-            <Button
-              onClick={() => energy > 0 && setRightDoorClosed(!rightDoorClosed)}
-              disabled={energy <= 0}
-              className={`text-2xl py-6 px-8 pixel-text ${
-                rightDoorClosed ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-              }`}
-            >
-              <Icon name={rightDoorClosed ? 'DoorClosed' : 'DoorOpen'} size={32} className="mr-2" />
-              ПРАВАЯ ДВЕРЬ
-            </Button>
-          </div>
-        </div>
+        <GameOffice
+          night={night}
+          timeDisplay={timeDisplay}
+          energy={energy}
+          leftDoorClosed={leftDoorClosed}
+          rightDoorClosed={rightDoorClosed}
+          flashlightOn={flashlightOn}
+          onToggleLeftDoor={() => energy > 0 && setLeftDoorClosed(!leftDoorClosed)}
+          onToggleRightDoor={() => energy > 0 && setRightDoorClosed(!rightDoorClosed)}
+          onToggleFlashlight={() => energy > 0 && setFlashlightOn(!flashlightOn)}
+          onOpenCamera={() => energy > 0 && setCameraOpen(true)}
+        />
       ) : (
-        <div className="h-screen flex flex-col bg-black">
-          <div className="flex-1 relative bg-gray-900 border-4 border-green-600 m-4">
-            <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,255,0,0.3)_2px,rgba(0,255,0,0.3)_4px)]"></div>
-            
-            <div className="absolute top-4 left-4 bg-black/90 p-4 border-2 border-green-500 z-50">
-              <p className="text-2xl pixel-text text-green-400">
-                КАМЕРА {selectedCamera + 1}: {LOCATIONS[selectedCamera]}
-              </p>
-            </div>
-
-            <div className="h-full flex items-center justify-center relative">
-              {selectedCamera === 0 && (
-                <div className="w-full h-full bg-gradient-to-b from-purple-900/50 to-gray-900 flex items-center justify-center relative">
-                  <div className="absolute inset-0 grid grid-cols-3 gap-8 p-12">
-                    <div className="bg-red-900/30 border-4 border-red-800 flex items-center justify-center">
-                      <span className="text-8xl">🎤</span>
-                    </div>
-                    <div className="bg-purple-900/30 border-4 border-purple-800 flex items-center justify-center">
-                      <span className="text-8xl">🎸</span>
-                    </div>
-                    <div className="bg-yellow-900/30 border-4 border-yellow-800 flex items-center justify-center">
-                      <span className="text-8xl">🎹</span>
-                    </div>
-                  </div>
-                  <p className="text-4xl pixel-text text-purple-400 absolute bottom-8">ГЛАВНАЯ СЦЕНА</p>
-                </div>
-              )}
-              
-              {selectedCamera === 1 && (
-                <div className="w-full h-full bg-gradient-to-b from-orange-900/50 to-gray-900 flex items-center justify-center relative">
-                  <div className="grid grid-cols-4 gap-4 p-8">
-                    {[...Array(12)].map((_, i) => (
-                      <div key={i} className="w-24 h-24 bg-brown-800/40 border-2 border-orange-700 rounded-full flex items-center justify-center">
-                        <span className="text-3xl">🍕</span>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-4xl pixel-text text-orange-400 absolute bottom-8">СТОЛОВАЯ</p>
-                </div>
-              )}
-              
-              {selectedCamera === 2 && (
-                <div className="w-full h-full bg-gradient-to-r from-gray-900 via-gray-800 to-black flex items-center justify-center relative">
-                  <div className="w-1/3 h-full bg-gradient-to-r from-transparent via-gray-700/50 to-black border-l-8 border-r-8 border-red-900/50"></div>
-                  <p className="text-4xl pixel-text text-blue-400 absolute bottom-8">КОРИДОР СЛЕВА</p>
-                </div>
-              )}
-              
-              {selectedCamera === 3 && (
-                <div className="w-full h-full bg-gradient-to-l from-gray-900 via-gray-800 to-black flex items-center justify-center relative">
-                  <div className="w-1/3 h-full bg-gradient-to-l from-transparent via-gray-700/50 to-black border-l-8 border-r-8 border-red-900/50"></div>
-                  <p className="text-4xl pixel-text text-blue-400 absolute bottom-8">КОРИДОР СПРАВА</p>
-                </div>
-              )}
-              
-              {selectedCamera === 4 && (
-                <div className="w-full h-full bg-gradient-to-b from-gray-800 to-gray-900 flex items-center justify-center relative">
-                  <div className="absolute inset-0">
-                    {[...Array(20)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="absolute bg-gray-700/40 border border-gray-600"
-                        style={{
-                          width: `${Math.random() * 100 + 50}px`,
-                          height: `${Math.random() * 100 + 50}px`,
-                          left: `${Math.random() * 80}%`,
-                          top: `${Math.random() * 80}%`,
-                        }}
-                      ></div>
-                    ))}
-                  </div>
-                  <span className="text-9xl animate-spin-slow">🌀</span>
-                  <p className="text-4xl pixel-text text-cyan-400 absolute bottom-8">ВЕНТИЛЯЦИЯ</p>
-                </div>
-              )}
-              
-              {selectedCamera === 5 && (
-                <div className="w-full h-full bg-gradient-to-r from-red-900/50 to-gray-900 flex items-center justify-center relative">
-                  <div className="w-1/2 h-3/4 bg-gray-800/60 border-8 border-red-900 rounded-lg flex items-center justify-center">
-                    <Icon name="DoorClosed" size={200} className="text-red-700" />
-                  </div>
-                  <p className="text-4xl pixel-text text-red-400 absolute bottom-8">ЛЕВАЯ ДВЕРЬ</p>
-                </div>
-              )}
-              
-              {selectedCamera === 6 && (
-                <div className="w-full h-full bg-gradient-to-l from-red-900/50 to-gray-900 flex items-center justify-center relative">
-                  <div className="w-1/2 h-3/4 bg-gray-800/60 border-8 border-red-900 rounded-lg flex items-center justify-center">
-                    <Icon name="DoorClosed" size={200} className="text-red-700" />
-                  </div>
-                  <p className="text-4xl pixel-text text-red-400 absolute bottom-8">ПРАВАЯ ДВЕРЬ</p>
-                </div>
-              )}
-              
-              <div className="absolute inset-0 pointer-events-none">
-                {Object.entries(animatronics).map(([name, status]) => {
-                  if (status.location === selectedCamera) {
-                    return (
-                      <div key={name} className="absolute inset-0 flex items-center justify-center bg-black/60">
-                        <div className="text-center space-y-4 animate-pulse">
-                          <div className="text-9xl">
-                            {name === 'freddy' && '🐻'}
-                            {name === 'bonnie' && '🐰'}
-                            {name === 'chica' && '🐔'}
-                          </div>
-                          <p className="text-6xl pixel-text text-red-500 animate-flicker glitch">
-                            {name === 'freddy' && 'ФРЕДДИ!'}
-                            {name === 'bonnie' && 'БОННИ!'}
-                            {name === 'chica' && 'ЧИКА!'}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                })}
-              </div>
-            </div>
-
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-50">
-              {LOCATIONS.slice(0, 7).map((_, index) => (
-                <Button
-                  key={index}
-                  onClick={() => setSelectedCamera(index)}
-                  className={`text-xl py-2 px-4 pixel-text ${
-                    selectedCamera === index ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-700 hover:bg-gray-600'
-                  }`}
-                >
-                  CAM {index + 1}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="h-24 bg-gray-800 flex items-center justify-center border-t-4 border-green-600">
-            <Button
-              onClick={() => setCameraOpen(false)}
-              className="text-2xl py-6 px-12 bg-red-600 hover:bg-red-700 border-4 border-red-800 pixel-text transition-all hover:scale-105"
-            >
-              <Icon name="X" size={32} className="mr-2" />
-              ЗАКРЫТЬ КАМЕРЫ
-            </Button>
-          </div>
-        </div>
+        <CameraSystem
+          selectedCamera={selectedCamera}
+          animatronics={animatronics}
+          locations={LOCATIONS}
+          onSelectCamera={setSelectedCamera}
+          onCloseCamera={() => setCameraOpen(false)}
+        />
       )}
 
       {energy <= 0 && (
